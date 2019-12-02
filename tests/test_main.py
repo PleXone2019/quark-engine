@@ -1,5 +1,6 @@
 
 import pytest
+from androguard.core.mutf8 import MUTF8String
 from androguard.core.analysis.analysis import MethodAnalysis
 
 from quark.main import XRule
@@ -33,9 +34,15 @@ class TestXRule():
         assert isinstance(result[0], MethodAnalysis)
 
     def test_upperFunc(self, xrule_obj):
-        result = xrule_obj.upperFunc("Ljava/lang/reflect/Field",
-                                     "setAccessible")
-        expect_func = "Landroid/support/v4/widget/SlidingPaneLayout$"\
-                      "SlidingPanelLayoutImplJB;"
-        assert expect_func in result[0]
+        result = xrule_obj.upperFunc("Landroid/content/ContentResolver",
+                                     "query")
 
+        expect_cls = "Lcom/example/google/service/ContactsHelper;"
+        expect_func = "getSIMContacts"
+        expect_tuple = (
+            MUTF8String.from_str(expect_cls),
+            MUTF8String.from_str(expect_func),
+        )
+        # (Lcom/example/google/service/ContactsHelper;, getSIMContacts)
+
+        assert expect_tuple in result
